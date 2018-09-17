@@ -182,15 +182,44 @@ func TestNewSource(t *testing.T) {
 		return
 	}
 
-	conf := config.NewConfig()
+	configmapSource := NewSource(
+		WithConfigPath(os.Getenv("HOME") + "/.kube/config"),
+	)
 
-	conf.Load(NewSource())
+	config.Load(configmapSource)
 
-	if mongodbHost := conf.Get("mongodb", "host").String("localhost"); mongodbHost != "127.0.0.1" {
-		t.Errorf("expected %v and got %v", "127.0.0.1", mongodbHost)
+	//fmt.Println(config.Get("mongodb","host").String("localhost"))
+
+	w, err := config.Watch("mongodb")
+	if err != nil {
+		// do something
 	}
-
-	if configPort := conf.Get("config", "port").Int(1337); configPort != 1337 {
-		t.Errorf("expected %v and got %v", "1337", configPort)
+	//
+	//// wait for next value
+	v, err := w.Next()
+	if err != nil {
+		// do something
 	}
+	fmt.Println(string(v.Bytes()))
+	//
+	type Host struct {
+		Host string `json:"host"`
+		Port int `json:"port"`
+	}
+	//
+	var host Host
+	//
+	v.Scan(&host)
+	//
+	fmt.Println(host)
+
+	//fmt.Println(conf.Get("mongodb", "host").String("localhost"))
+	//
+	//if mongodbHost := conf.Get("mongodb", "host").String("localhost"); mongodbHost != "127.0.0.1" {
+	//	t.Errorf("expected %v and got %v", "127.0.0.1", mongodbHost)
+	//}
+	//
+	//if configPort := conf.Get("config", "port").Int(1337); configPort != 1337 {
+	//	t.Errorf("expected %v and got %v", "1337", configPort)
+	//}
 }

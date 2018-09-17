@@ -242,7 +242,7 @@ func (w *watcher) Next() (reader.Value, error) {
 		if err != nil {
 			return nil, err
 		}
-		w.value = v.Get(w.path...)
+		w.value = v.Get()
 		return w.value, nil
 	}
 }
